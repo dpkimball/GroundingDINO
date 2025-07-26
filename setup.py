@@ -41,7 +41,16 @@ from setuptools import find_packages, setup
 from torch.utils.cpp_extension import CUDA_HOME, CppExtension, CUDAExtension
 
 # groundingdino version info
-version = "0.1.0"
+ENV_STORE = os.path.join(os.environ.get("SCRIPTS_ROOT", ""), ".env.versions")
+version = "0.1.0"  # fallback
+try:
+    with open(ENV_STORE) as f:
+        for line in f:
+            if line.startswith("GROUNDINGDINO_VERSION="):
+                version = line.strip().split("=")[1]
+                break
+except Exception:
+    pass
 package_name = "groundingdino"
 cwd = os.path.dirname(os.path.abspath(__file__))
 
@@ -99,7 +108,7 @@ def get_extensions():
         extra_compile_args["nvcc"] = []
         return None
 
-    sources = [os.path.join(extensions_dir, s) for s in sources]
+    sources = [os.path.relpath(s, start=cwd) for s in sources]
     include_dirs = [extensions_dir]
 
     ext_modules = [
@@ -203,7 +212,7 @@ if __name__ == "__main__":
 
     setup(
         name="groundingdino",
-        version="0.1.0",
+        version=version,
         author="International Digital Economy Academy, Shilong Liu",
         url="https://github.com/IDEA-Research/GroundingDINO",
         description="open-set object detector",
@@ -215,6 +224,10 @@ if __name__ == "__main__":
                 "tests",
             )
         ),
+        include_package_data=True,
+        package_data={"groundingdino": ["config/*.py", "weights/*.pth"]},
+
+        # Adding extensions for C++/CUDA code (.cpp, .cu files)
         ext_modules=get_extensions(),
         cmdclass={"build_ext": torch.utils.cpp_extension.BuildExtension},
     )
