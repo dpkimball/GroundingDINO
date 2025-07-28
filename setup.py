@@ -40,17 +40,7 @@ import torch
 from setuptools import find_packages, setup
 from torch.utils.cpp_extension import CUDA_HOME, CppExtension, CUDAExtension
 
-# groundingdino version info
-ENV_STORE = os.path.join(os.environ.get("SCRIPTS_ROOT", ""), ".env.versions")
-version = "0.1.0"  # fallback
-try:
-    with open(ENV_STORE) as f:
-        for line in f:
-            if line.startswith("GROUNDINGDINO_VERSION="):
-                version = line.strip().split("=")[1]
-                break
-except Exception:
-    pass
+version = "0.1.0"
 package_name = "groundingdino"
 cwd = os.path.dirname(os.path.abspath(__file__))
 
@@ -212,7 +202,7 @@ if __name__ == "__main__":
 
     setup(
         name="groundingdino",
-        version=version,
+        version="0.1.3",
         author="International Digital Economy Academy, Shilong Liu",
         url="https://github.com/IDEA-Research/GroundingDINO",
         description="open-set object detector",
